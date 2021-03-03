@@ -22,7 +22,7 @@ pages = np.linspace(1,146,146, dtype=int)
 #Iterate over each web page
 for page in pages:
     #make request from CatFriendlyClinic.org
-    url = "https://catfriendlyclinic.org/cat-owners/find-a-clinic/"#page/"+str(page)+"/"
+    url = "https://catfriendlyclinic.org/cat-owners/find-a-clinic/page/"+str(page)+"/"
     webpage = rq.get(url)
 
     #Create BeautifulSoup object to traverse the webpage
@@ -37,13 +37,20 @@ for page in pages:
         clinic_name = container.h2.get_text()
         clinic_names.append(clinic_name)
         '''Clinic Accreditation'''
-        accreditation = container.div['class'][1]
+        #check to see if a vet has an accreditation
+        if container.div is not None:
+            accreditation = container.div['class'][1]
+        else:
+            accreditation = " "
+        #assign an accreditation to a readable value
         if accreditation == "rating--gold":
             accreditations.append("Gold")
         elif accreditation == "rating--silver":
             accreditations.append("Silver")
         elif accreditation == "rating--bronze":
             accreditations.append("Bronze")
+        else:
+            accreditations.append(" ")
         '''Clinic Addresses'''
         clinic_address = container.section.get_text()
         #split clinic addresses
@@ -60,6 +67,7 @@ for page in pages:
         clinic_address_4.append(clinic_address_filt[3])
         clinic_address_5.append(clinic_address_filt[4])
         clinic_address_6.append(clinic_address_filt[5])
+    print("Page "+str(page)+" Complete")
 
 #create dataframe
 data = {"Name":clinic_names, "Clinic Rating Level":accreditations, "Address 1":clinic_address_1, "Address 2":clinic_address_2, "Address 3":clinic_address_3, "Address 4":clinic_address_4, "Address 5":clinic_address_5, "Address 6":clinic_address_6}
